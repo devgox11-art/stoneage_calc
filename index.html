@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스톤키 스탯 시뮬레이터</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .header-footer {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 12px;
+            text-align: right;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-field label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .input-field input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-field input:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .option-group {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e8ebf5;
+        }
+
+        .option-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .option-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .option-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option-inputs .input-field input {
+            font-size: 15px;
+            padding: 10px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .button-group-single {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .options-container .section {
+            margin: 0;
+        }
+
+        .options-container .section:first-child .section-title {
+            text-align: right;
+        }
+
+        /* Horizontal VS (Visible on Desktop) */
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        /* Vertical VS (Hidden on Desktop) */
+        .vs-divider-vertical {
+            display: none;
+        }
+
+        /* Responsive design for Mobile (iPhone) */
+        @media (max-width: 900px) {
+            .options-container {
+                display: block; /* Stack vertically on mobile */
+            }
+
+            .vs-divider {
+                display: none; /* Hide horizontal VS */
+            }
+
+            .vs-divider-vertical {
+                display: flex; /* Show vertical VS on mobile */
+                align-items: center;
+                justify-content: center;
+                font-weight: 900;
+                color: #764ba2;
+                font-size: 1.2rem;
+                
+                /* Format: margin: [top] [left/right] [bottom] */
+                margin: -15px 0 -2px 0 !important;
+            }
+
+            /* Add decorative lines next to "VS" */
+            .vs-divider-vertical::before,
+            .vs-divider-vertical::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: #e0e0e0;
+                margin: 0px 0;
+                max-width: 40px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-calculate:active {
+            transform: scale(0.98);
+        }
+
+        .btn-reset {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-reset:active {
+            background: #e0e0e0;
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 12px;
+            border: 2px solid #e8ebf5;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item.option2 {
+            border-left-color: #764ba2;
+        }
+
+        .result-item.winner {
+            border-left-color: #ff9800;
+            background: #fff7e6;
+            box-shadow: 0 10px 30px rgba(255, 152, 0, 0.12);
+        }
+
+        .result-label {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .result-change {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .comparison {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #ffc107;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 24px 0;
+        }
+
+        .comparison-winner {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .comparison-detail {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stats-preview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .stat-line {
+            padding: 5px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .section-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .guide-link {
+            font-size: 13px;
+            color: #667eea;
+            text-decoration: underline;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .guide-link:hover {
+            color: #764ba2;
+        }
+
+        .guide-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .guide-modal.show {
+            display: flex;
+        }
+
+        .guide-modal .modal-box {
+            width: min(100%, 560px);
+            max-height: 90vh;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.25);
+            overflow: auto;
+            position: relative;
+        }
+
+        .guide-modal .modal-box h2 {
+            margin-bottom: 16px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .guide-modal .modal-box p,
+        .guide-modal .modal-box li {
+            color: #4d4d4d;
+            line-height: 1.65;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .guide-modal .modal-box ul {
+            padding-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        .guide-modal .modal-box button {
+            margin-top: 12px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 10px;
+            background: #667eea;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .footer-link {
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .footer-link:hover {
+            color: #764ba2;
+        }
+
+        .groundrule-section {
+            display: block;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 12px;
+            border: 2px solid #e8ebf5;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .groundrule-section.show {
+            display: block;
+        }
+
+        .groundrule-subsection {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .groundrule-subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .groundrule-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .groundrule-content {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+        }
+
+        .option-group.winner-highlight {
+            border: 3px solid #ff9800; /* 강조 색상 */
+            box-shadow: 0 0 15px rgba(255, 152, 0, 0.4);
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚔️ 스톤에이지 키우기 ⚔️</h1>
+            <h1>스탯 시뮬레이터</h1>
+            <p>옵션 선택지 추천 도구</p>
+<div class="header-footer">KR14 사파이어</div>
+        </div>
+
+        <div class="content">
+            <!-- 기본 스탯 입력 -->
+            <div class="section">
+                <div class="section-title-row">
+                <div class="section-title">📊 현재 스탯</div>
+                <span class="guide-link" onclick="toggleGuidePopup()">작성 방법 가이드</span>
+            </div>
+                <div class="input-group">
+                    <div class="input-field">
+                        <label>기본 공격력</label>
+                        <input type="text" id="baseAttack" value="25000" min="1" placeholder="예: 25000">
+                    </div>
+                    <div class="input-field">
+                        <label>공격력 증가량</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="attackIncreaseValue" value="454.35" placeholder="예: 454.35" style="flex: 1;">
+                            <select id="attackIncreaseUnit" style="padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; width: 80px; font-size: 14px;">
+                                <option value="1000">K</option>
+                                <option value="1000000">M</option>
+                                <option value="1">숫자</option>
+                                <option value="0.01">%</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <div class="input-field">
+                        <label>치명타 피해 (%)</label>
+                        <input type="text" id="critDamage" value="400" min="100" placeholder="예: 400">
+                    </div>
+                    <div class="input-field">
+                        <label>치명타 확률 (%)</label>
+                        <input type="text" id="critChance" value="25" min="0" max="100" placeholder="예: 25">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <div class="input-field">
+                        <label>슈퍼 치명타 피해 (%)</label>
+                        <input type="text" id="superCritDamage" value="150" min="100" placeholder="예: 150">
+                    </div>
+                    <div class="input-field">
+                        <label>슈퍼 치명타 확률 (%)</label>
+                        <input type="text" id="superCritChance" value="3" min="0" max="100" placeholder="예: 3"></input>
+                    </div>
+                </div>
+                <div class="button-group-single">
+                    <button class="btn-calculate" onclick="saveStats()" style="background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%)">💾 현재 스탯 저장</button>
+                </div>
+            </div>
+
+            <div class="section-title">⚖️ 선택 옵션 비교</div>
+            <div class="options-container">
+                <!-- 선택지 1 -->
+                <div class="section">
+                    <div class="option-group">
+                        <div class="option-title">옵션 1 타입</div>
+                        <div class="input-field" style="margin-bottom: 12px;">
+                            <select id="option1Type" style="padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                                <option value="attackIncrease" selected>공격력 증가 (%)</option>
+                                <option value="critDamageIncrease">치명타 피해 증가 (%)</option>
+                                <option value="critChanceIncrease">치명타 확률 증가 (%)</option>
+                                <option value="superCritDamageIncrease">슈퍼 치명타 피해 증가 (%)</option>
+                                <option value="superCritChanceIncrease">슈퍼 치명타 확률 증가 (%)</option>
+                            </select>
+                        </div>
+                        <div class="input-field">
+                            <label>옵션 1 값</label>
+                            <input type="number" id="option1Value" value="80" step="0.1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vs-divider">vs</div>
+                <div class="vs-divider-vertical">vs</div>
+
+                <!-- 선택지 2 -->
+                <div class="section">
+                    <div class="option-group">
+                        <div class="option-title">옵션 2 타입</div>
+                        <div class="input-field" style="margin-bottom: 12px;">
+                            <select id="option2Type" style="padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                                <option value="attackIncrease">공격력 증가 (%)</option>
+                                <option value="critDamageIncrease">치명타 피해 증가 (%)</option>
+                                <option value="critChanceIncrease" selected>치명타 확률 증가 (%)</option>
+                                <option value="superCritDamageIncrease">슈퍼 치명타 피해 증가 (%)</option>
+                                <option value="superCritChanceIncrease">슈퍼 치명타 확률 증가 (%)</option>
+                            </select>
+                        </div>
+                        <div class="input-field">
+                            <label>옵션 2 값</label>
+                            <input type="number" id="option2Value" value="3.75" step="0.1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 계산 버튼 -->
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculate()">비교하기</button>
+                <button class="btn-reset" onclick="reset()">초기화</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <!-- 결과 -->
+            <div class="results" id="results">
+                <div class="section-title">📈 계산 결과</div>
+                
+                <div class="comparison">
+                    <div class="comparison-winner" id="winner">선택지 1 추천</div>
+                    <div class="comparison-detail" id="winnerDetail">증가량 차이: 0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">선택지 1 - 평균 딜량</div>
+                    <div class="result-value" id="option1Dps">0</div>
+                    <div class="result-change">증가량: <span id="option1Change">0</span></div>
+                    <div class="stats-preview" id="option1Stats"></div>
+                </div>
+
+                <div class="result-item option2">
+                    <div class="result-label">선택지 2 - 평균 딜량</div>
+                    <div class="result-value" id="option2Dps">0</div>
+                    <div class="result-change">증가량: <span id="option2Change">0</span></div>
+                    <div class="stats-preview" id="option2Stats"></div>
+                </div>
+
+            </div>
+
+            <div class="groundrule-section" id="groundruleSection">
+                <div class="groundrule-subsection">
+                    <div class="groundrule-title">⚠️ Limitation (제한사항)</div>
+                    <div class="groundrule-content">• 데미지 계산식이 정확하지 않습니다. 알려진 정보 기반 추정식입니다.
+• 넷마블의 공식 데미지 계산식이 아니므로 실제 게임과 차이가 있을 수 있습니다.
+• 또한 몬스터의 방어력이 미치는 영향력은 계산되어 있지 않습니다.
+• 이 계산기는 순수 공격력 기반의 상대적 딜량 비교를 목표로 합니다.
+• 실제 인-게임 데미지는 몬스터의 방어력, 속성 저항 등 여러 요소의 영향을 받습니다.</div>
+                </div>
+
+                <div class="groundrule-subsection">
+                    <div class="groundrule-title">📋 Ground Rule (데미지 계산식)</div>
+                    <div class="groundrule-content">• 최종 공격력 = 기본 공격력 + (기본 공격력 × 공격력 증가 옵션의 총 합)
+• 1회 치명타 피해 = 최종 공격력 × (치명타 피해 %)
+• 1회 슈퍼 치명타 피해 = 최종 공격력 × (치명타 피해 %) × (슈퍼 치명타 피해 %)
+• 평균 딜량(딜) = (1 - 치명타 확률) × 기본 공격력 + (치명타 확률 × (1 - 슈퍼 치명타 확률)) × 치명타 피해 + (치명타 확률 × 슈퍼 치명타 확률) × 슈퍼 치명타 피해</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="guide-modal" id="critGuideModal" onclick="toggleGuidePopup(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <h2>작성 방법 가이드</h2>
+            <p>캐릭터 정보의 수치를 직접 입력하면 됩니다.</p>
+            <ul>
+                <li><strong>기본 공격력</strong> : 공격력 수치 중 검은색으로 표현된 기본 공격력 수치를 입력합니다</li>
+                <li><strong>공격력 증가량</strong> : 공격력 수치 중 +로 표현된 초록색 수치를 입력합니다.</li>
+                <li><strong>치명타 피해/확률</strong> : 총 합을 % 단위로 입력합니다. 예시: (2% + 28%)이면 30 입력</li>
+                <li><strong>슈퍼 치명타 피해/확률</strong> : 위와 동일</li>
+            </ul>
+            <button id="guideClose" onclick="toggleGuidePopup(event)">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        // 쉼표 제거 함수
+        function removeCommas(str) {
+            return String(str).replace(/,/g, '');
+        }
+
+        // 숫자만 추출 함수
+        function parseNumber(str) {
+            const cleaned = removeCommas(str);
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function getTypeLabel(type) {
+            const labels = {
+                'attackIncrease': '공격력 증가',
+                'critDamageIncrease': '치명타 피해 증가',
+                'critChanceIncrease': '치명타 확률 증가',
+                'superCritDamageIncrease': '슈퍼 치명타 피해 증가',
+                'superCritChanceIncrease': '슈퍼 치명타 확률 증가'
+            };
+            return labels[type] || type;
+        }
+
+        function calculateDPS(baseAttack, attackIncrease, critDamage, critChance, superCritDamage, superCritChance) {
+            // 최종 공격력 = 기본 공격력 + 기본 공격력 * (공격력 증가 옵션의 총 합%)
+            const finalAttack = baseAttack + baseAttack * (attackIncrease / 100);
+
+            // 확률 변환
+            const cCh = critChance / 100;
+            const sCh = superCritChance / 100;
+
+            // 치명타 피해 = 최종 공격력 * (치명타 피해%)
+            const critDmg = finalAttack * (critDamage / 100);
+
+            // 슈퍼 치명타 피해 = 최종 공격력 * (치명타 피해%) * (슈퍼 치명타 피해%)
+            const superCritDmg = finalAttack * (critDamage / 100) * (superCritDamage / 100);
+
+            // 평균 딜량 계산
+            // = (1 - 치명타 확률) * 기본 공격력
+            //   + (치명타 확률 * (1 - 슈퍼 치명타 확률)) * 치명타 피해
+            //   + (치명타 확률 * 슈퍼 치명타 확률) * 슈퍼 치명타 피해
+            const baseDPS = (1 - cCh) * finalAttack;
+            const critDPS = cCh * (1 - sCh) * critDmg;
+            const superCritDPS = cCh * sCh * superCritDmg;
+
+            const totalDPS = baseDPS + critDPS + superCritDPS;
+
+            return {
+                finalAttack: finalAttack,
+                baseDPS: baseDPS,
+                critDPS: critDPS,
+                superCritDPS: superCritDPS,
+                totalDPS: totalDPS
+            };
+        }
+
+        function calculate() {
+            try {
+                // 입력값 가져오기
+                const baseAttack = parseNumber(document.getElementById('baseAttack').value);
+                
+                // 공격력 증가값 계산 (절대값 → %로 변환)
+                const attackIncreaseValue = parseNumber(document.getElementById('attackIncreaseValue').value);
+                const attackIncreaseUnit = parseFloat(document.getElementById('attackIncreaseUnit').value);
+                const totalAttackIncreaseValue = attackIncreaseValue * attackIncreaseUnit;
+                // const attackIncreasePercent = baseAttack > 0 ? (totalAttackIncreaseValue / baseAttack) * 100 : 0;
+                let attackIncreasePercent = 0;
+
+                if (attackIncreaseUnit === 0.01) { 
+                    // 단위가 %인 경우 입력값(454.35 등)을 그대로 퍼센트로 사용
+                    attackIncreasePercent = attackIncreaseValue; 
+                } else {
+                    // 그 외(K, M)는 기존처럼 절대값을 계산한 뒤 %로 역산
+                    const totalAttackIncreaseValue = attackIncreaseValue * attackIncreaseUnit;
+                    attackIncreasePercent = baseAttack > 0 ? (totalAttackIncreaseValue / baseAttack) * 100 : 0;
+                }
+                const critDamage = parseNumber(document.getElementById('critDamage').value);
+                const critChance = parseNumber(document.getElementById('critChance').value);
+                const superCritDamage = parseNumber(document.getElementById('superCritDamage').value);
+                const superCritChance = parseNumber(document.getElementById('superCritChance').value);
+
+                const option1Type = document.getElementById('option1Type').value;
+                const option1Value = parseNumber(document.getElementById('option1Value').value);
+                const option2Type = document.getElementById('option2Type').value;
+                const option2Value = parseNumber(document.getElementById('option2Value').value);
+
+                if (isNaN(option1Value)) throw new Error('선택지 1 값이 올바르지 않습니다.');
+                if (isNaN(option2Value)) throw new Error('선택지 2 값이 올바르지 않습니다.');
+
+                // 유효성 검사
+                if (isNaN(baseAttack) || baseAttack <= 0) throw new Error('기본 공격력은 0보다 커야 합니다.');
+                if (isNaN(attackIncreasePercent)) throw new Error('공격력 증가값이 올바르지 않습니다.');
+                if (critChance < 0 || critChance > 100) throw new Error('치명타 확률은 0~100 사이여야 합니다.');
+                if (superCritChance < 0 || superCritChance > 100) throw new Error('슈퍼 치명타 확률은 0~100 사이여야 합니다.');
+
+                // 기존 DPS 계산 (현재 공격력 증가값 포함)
+                const baseDPS = calculateDPS(baseAttack, attackIncreasePercent, critDamage, critChance, superCritDamage, superCritChance);
+
+                // 선택지 1 DPS 계산
+                let option1Stats = {
+                    attackIncreasePercent: attackIncreasePercent,
+                    critDamage: critDamage,
+                    critChance: critChance,
+                    superCritDamage: superCritDamage,
+                    superCritChance: superCritChance
+                };
+
+                if (option1Type === 'attackIncrease') {
+                    option1Stats.attackIncreasePercent += option1Value;
+                } else if (option1Type === 'critDamageIncrease') {
+                    option1Stats.critDamage += option1Value;
+                } else if (option1Type === 'critChanceIncrease') {
+                    option1Stats.critChance += option1Value;
+                } else if (option1Type === 'superCritDamageIncrease') {
+                    option1Stats.superCritDamage += option1Value;
+                } else if (option1Type === 'superCritChanceIncrease') {
+                    option1Stats.superCritChance += option1Value;
+                }
+
+                const option1DPS = calculateDPS(
+                    baseAttack,
+                    option1Stats.attackIncreasePercent,
+                    option1Stats.critDamage,
+                    option1Stats.critChance,
+                    option1Stats.superCritDamage,
+                    option1Stats.superCritChance
+                );
+
+                // 선택지 2 DPS 계산
+                let option2Stats = {
+                    attackIncreasePercent: attackIncreasePercent,
+                    critDamage: critDamage,
+                    critChance: critChance,
+                    superCritDamage: superCritDamage,
+                    superCritChance: superCritChance
+                };
+
+                if (option2Type === 'attackIncrease') {
+                    option2Stats.attackIncreasePercent += option2Value;
+                } else if (option2Type === 'critDamageIncrease') {
+                    option2Stats.critDamage += option2Value;
+                } else if (option2Type === 'critChanceIncrease') {
+                    option2Stats.critChance += option2Value;
+                } else if (option2Type === 'superCritDamageIncrease') {
+                    option2Stats.superCritDamage += option2Value;
+                } else if (option2Type === 'superCritChanceIncrease') {
+                    option2Stats.superCritChance += option2Value;
+                }
+
+                const option2DPS = calculateDPS(
+                    baseAttack,
+                    option2Stats.attackIncreasePercent,
+                    option2Stats.critDamage,
+                    option2Stats.critChance,
+                    option2Stats.superCritDamage,
+                    option2Stats.superCritChance
+                );
+
+                // 결과 표시
+                document.getElementById('option1Dps').textContent = option1DPS.totalDPS.toFixed(2);
+                document.getElementById('option1Change').textContent = (option1DPS.totalDPS - baseDPS.totalDPS).toFixed(2);
+                document.getElementById('option1Stats').innerHTML = `
+                    <div class="stat-line">최종 공격력: ${option1DPS.finalAttack.toFixed(1)}</div>
+                    <div class="stat-line">기본 딜: ${option1DPS.baseDPS.toFixed(2)}</div>
+                    <div class="stat-line">치명타 피해: ${option1DPS.critDPS.toFixed(2)}</div>
+                    <div class="stat-line">슈퍼 치명타: ${option1DPS.superCritDPS.toFixed(2)}</div>
+                `;
+
+                document.getElementById('option2Dps').textContent = option2DPS.totalDPS.toFixed(2);
+                document.getElementById('option2Change').textContent = (option2DPS.totalDPS - baseDPS.totalDPS).toFixed(2);
+                document.getElementById('option2Stats').innerHTML = `
+                    <div class="stat-line">최종 공격력: ${option2DPS.finalAttack.toFixed(1)}</div>
+                    <div class="stat-line">기본 딜: ${option2DPS.baseDPS.toFixed(2)}</div>
+                    <div class="stat-line">치명타 피해: ${option2DPS.critDPS.toFixed(2)}</div>
+                    <div class="stat-line">슈퍼 치명타: ${option2DPS.superCritDPS.toFixed(2)}</div>
+                `;
+
+                // 1. 승자 결정 및 UI 데이터 준비
+                const diff = option1DPS.totalDPS - option2DPS.totalDPS;
+                const absDiff = Math.abs(diff);
+                const winnerText = diff > 0 ? '선택지 1 추천' : diff < 0 ? '선택지 2 추천' : '동일';
+                
+                // 2. [수정사항 2] 결과 섹션 상단 '추천 필드' 업데이트
+                document.getElementById('winner').textContent = winnerText;
+                document.getElementById('winnerDetail').textContent = 
+                    `증가량 차이: ${absDiff.toFixed(2)} (${(diff > 0 ? '+' : '')}${(diff / (diff > 0 ? option2DPS.totalDPS : option1DPS.totalDPS) * 100).toFixed(1)}%)`;
+
+                // 3. 결과 항목 값 업데이트
+                document.getElementById('option1Dps').textContent = option1DPS.totalDPS.toFixed(2);
+                document.getElementById('option1Change').textContent = (option1DPS.totalDPS - baseDPS.totalDPS).toFixed(2);
+                document.getElementById('option1Stats').innerHTML = `
+                    <div class="stat-line">최종 공격력: ${option1DPS.finalAttack.toFixed(1)}</div>
+                    <div class="stat-line">기본 딜: ${option1DPS.baseDPS.toFixed(2)}</div>
+                    <div class="stat-line">치명타 피해: ${option1DPS.critDPS.toFixed(2)}</div>
+                    <div class="stat-line">슈퍼 치명타: ${option1DPS.superCritDPS.toFixed(2)}</div>
+                `;
+
+                document.getElementById('option2Dps').textContent = option2DPS.totalDPS.toFixed(2);
+                document.getElementById('option2Change').textContent = (option2DPS.totalDPS - baseDPS.totalDPS).toFixed(2);
+                document.getElementById('option2Stats').innerHTML = `
+                    <div class="stat-line">최종 공격력: ${option2DPS.finalAttack.toFixed(1)}</div>
+                    <div class="stat-line">기본 딜: ${option2DPS.baseDPS.toFixed(2)}</div>
+                    <div class="stat-line">치명타 피해: ${option2DPS.critDPS.toFixed(2)}</div>
+                    <div class="stat-line">슈퍼 치명타: ${option2DPS.superCritDPS.toFixed(2)}</div>
+                `;
+
+                // 4. [수정사항 1] 선택 옵션 섹션 및 결과 섹션 강조 표시
+                const option1Box = document.querySelector('.result-item');
+                const option2Box = document.querySelector('.result-item.option2');
+                const inputOption1 = document.querySelectorAll('.option-group')[0]; // 입력창1
+                const inputOption2 = document.querySelectorAll('.option-group')[1]; // 입력창2
+
+                // 클래스 초기화
+                [option1Box, option2Box, inputOption1, inputOption2].forEach(el => {
+                    el.classList.remove('winner', 'winner-highlight');
+                });
+
+                if (diff > 0) {
+                    option1Box.classList.add('winner');
+                    inputOption1.classList.add('winner-highlight'); // 입력창 강조
+                } else if (diff < 0) {
+                    option2Box.classList.add('winner');
+                    inputOption2.classList.add('winner-highlight'); // 입력창 강조
+                }
+
+                document.getElementById('errorMessage').classList.remove('show');
+                document.getElementById('results').classList.add('show');
+
+            //     // 승자 결정
+            //     const diff = option1DPS.totalDPS - option2DPS.totalDPS;
+            //     const absDiff = Math.abs(diff);
+            //     const winner = diff > 0 ? '선택지 1 추천' : diff < 0 ? '선택지 2 추천' : '동일';
+            //     document.getElementById('winner').textContent = winner;
+            //     document.getElementById('winnerDetail').textContent = 
+            //         `증가량 차이: ${absDiff.toFixed(2)} (${(diff > 0 ? '+' : '')}${(diff / option2DPS.totalDPS * 100).toFixed(1)}%)`;
+
+            //     // 추천 옵션 강조
+            //     const option1Box = document.querySelector('.result-item');
+            //     const option2Box = document.querySelector('.result-item.option2');
+            //     option1Box.classList.remove('winner');
+            //     option2Box.classList.remove('winner');
+            //     if (diff > 0) {
+            //         option1Box.classList.add('winner');
+            //     } else if (diff < 0) {
+            //         option2Box.classList.add('winner');
+            //     }
+
+            //     // 에러 메시지 숨기기
+            //     document.getElementById('errorMessage').classList.remove('show');
+
+            //     // 결과 표시
+            //     document.getElementById('results').classList.add('show');
+
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = '❌ ' + error.message;
+                document.getElementById('errorMessage').classList.add('show');
+                document.getElementById('results').classList.remove('show');
+            }
+        }
+
+        function reset() {
+            document.getElementById('baseAttack').value = '25000';
+            document.getElementById('attackIncreaseValue').value = '454.35';
+            document.getElementById('attackIncreaseUnit').value = '1';
+            document.getElementById('critDamage').value = '400';
+            document.getElementById('critChance').value = '25';
+            document.getElementById('superCritDamage').value = '150';
+            document.getElementById('superCritChance').value = '3';
+            document.getElementById('option1Type').value = 'attackIncrease';
+            document.getElementById('option1Value').value = '80';
+            document.getElementById('option2Type').value = 'critChanceIncrease';
+            document.getElementById('option2Value').value = '3.75';
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+
+        // LocalStorage에서 스탯 로드
+        function loadStats() {
+            const saved = localStorage.getItem('gameStats');
+            if (saved) {
+                const stats = JSON.parse(saved);
+                document.getElementById('baseAttack').value = stats.baseAttack || '25000';
+                document.getElementById('attackIncreaseValue').value = stats.attackIncreaseValue || '454.35';
+                document.getElementById('attackIncreaseUnit').value = stats.attackIncreaseUnit || '1';
+                document.getElementById('critDamage').value = stats.critDamage || '400';
+                document.getElementById('critChance').value = stats.critChance || '25';
+                document.getElementById('superCritDamage').value = stats.superCritDamage || '150';
+                document.getElementById('superCritChance').value = stats.superCritChance || '3';
+            }
+        }
+
+        // 스탯 저장
+        function saveStats() {
+            const stats = {
+                baseAttack: document.getElementById('baseAttack').value,
+                attackIncreaseValue: document.getElementById('attackIncreaseValue').value,
+                attackIncreaseUnit: document.getElementById('attackIncreaseUnit').value,
+                critDamage: document.getElementById('critDamage').value,
+                critChance: document.getElementById('critChance').value,
+                superCritDamage: document.getElementById('superCritDamage').value,
+                superCritChance: document.getElementById('superCritChance').value
+            };
+            localStorage.setItem('gameStats', JSON.stringify(stats));
+            alert('✅ 현재 스탯이 저장되었습니다!');
+        }
+
+        // 페이지 로드 시 스탯 복원
+        window.addEventListener('load', function() {
+            loadStats();
+        });
+
+        function toggleGuidePopup(event) {
+            const modal = document.getElementById('critGuideModal');
+            if (event && event.target && (event.target.id === 'guideClose' || event.target.classList.contains('guide-modal'))) {
+                modal.classList.remove('show');
+                return;
+            }
+            modal.classList.toggle('show');
+        }
+
+        // Enter 키로 계산 실행
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                calculate();
+            }
+        });
+    </script>
+</body>
+</html>
