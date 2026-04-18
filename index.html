@@ -726,8 +726,8 @@
             const finalAttack = baseAttack + baseAttack * (attackIncrease / 100);
 
             // 확률 변환
-            const cCh = critChance / 100;
-            const sCh = superCritChance / 100;
+            const cCh = Math.min(1, critChance / 100);
+            const sCh = Math.min(1, superCritChance / 100);
 
             // 치명타 피해 = 최종 공격력 * (치명타 피해%)
             const critDmg = finalAttack * (critDamage / 100);
