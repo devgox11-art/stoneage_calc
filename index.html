@@ -1037,6 +1037,16 @@
             document.getElementById('option2Value').value = '3.75';
             document.getElementById('results').classList.remove('show');
             document.getElementById('errorMessage').classList.remove('show');
+
+            const option1Box = document.querySelector('.result-item');
+            const option2Box = document.querySelector('.result-item.option2');
+            const inputOption1 = document.querySelectorAll('.option-group')[0];
+            const inputOption2 = document.querySelectorAll('.option-group')[1];
+
+            if (option1Box) option1Box.classList.remove('winner');
+            if (option2Box) option2Box.classList.remove('winner');
+            if (inputOption1) inputOption1.classList.remove('winner-highlight');
+            if (inputOption2) inputOption2.classList.remove('winner-highlight');
         }
 
         // LocalStorage에서 스탯 로드
