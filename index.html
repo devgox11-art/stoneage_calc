@@ -446,6 +446,33 @@
             cursor: pointer;
         }
 
+        .guide-images {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .guide-images img {
+            width: 100%;
+            max-width: calc(50% - 8px);
+            border-radius: 14px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+            object-fit: cover;
+        }
+
+        @media (max-width: 640px) {
+            .guide-images {
+                flex-direction: column;
+            }
+
+            .guide-images img {
+                max-width: 100%;
+            }
+        }
+
         .info-text {
             font-size: 12px;
             color: #999;
@@ -542,15 +569,15 @@
                 <div class="input-group">
                     <div class="input-field">
                         <label>기본 공격력</label>
-                        <input type="text" id="baseAttack" value="25000" min="1" placeholder="예: 25000">
+                        <input type="text" id="baseAttack" value="22724" min="1" placeholder="예: 22724">
                     </div>
                     <div class="input-field">
                         <label>공격력 증가량</label>
                         <div style="display: flex; gap: 8px;">
-                            <input type="text" id="attackIncreaseValue" value="454.35" placeholder="예: 454.35" style="flex: 1;">
+                            <input type="text" id="attackIncreaseValue" value="1.98" placeholder="예: 1.98" style="flex: 1;">
                             <select id="attackIncreaseUnit" style="padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; width: 80px; font-size: 14px;">
-                                <option value="1000">K</option>
                                 <option value="1000000">M</option>
+                                <option value="1000">K</option>
                                 <option value="1">숫자</option>
                                 <option value="0.01">%</option>
                             </select>
@@ -560,21 +587,21 @@
                 <div class="input-group">
                     <div class="input-field">
                         <label>치명타 피해 (%)</label>
-                        <input type="text" id="critDamage" value="400" min="100" placeholder="예: 400">
+                        <input type="text" id="critDamage" value="577" min="100" placeholder="예: 577">
                     </div>
                     <div class="input-field">
                         <label>치명타 확률 (%)</label>
-                        <input type="text" id="critChance" value="25" min="0" max="100" placeholder="예: 25">
+                        <input type="text" id="critChance" value="32" min="0" max="100" placeholder="예: 32">
                     </div>
                 </div>
                 <div class="input-group">
                     <div class="input-field">
                         <label>슈퍼 치명타 피해 (%)</label>
-                        <input type="text" id="superCritDamage" value="150" min="100" placeholder="예: 150">
+                        <input type="text" id="superCritDamage" value="195" min="100" placeholder="예: 195">
                     </div>
                     <div class="input-field">
                         <label>슈퍼 치명타 확률 (%)</label>
-                        <input type="text" id="superCritChance" value="3" min="0" max="100" placeholder="예: 3"></input>
+                        <input type="text" id="superCritChance" value="4.4" min="0" max="100" placeholder="예: 4.4"></input>
                     </div>
                 </div>
                 <div class="button-group-single">
@@ -595,6 +622,8 @@
                                 <option value="critChanceIncrease">치명타 확률 증가 (%)</option>
                                 <option value="superCritDamageIncrease">슈퍼 치명타 피해 증가 (%)</option>
                                 <option value="superCritChanceIncrease">슈퍼 치명타 확률 증가 (%)</option>
+                                <option value="finalAttackIncrease">최종 공격력 증가 (%)</option>
+                                <option value="totalDPSIncrease">최종 피해량 증가 (%)</option>
                             </select>
                         </div>
                         <div class="input-field">
@@ -618,6 +647,8 @@
                                 <option value="critChanceIncrease" selected>치명타 확률 증가 (%)</option>
                                 <option value="superCritDamageIncrease">슈퍼 치명타 피해 증가 (%)</option>
                                 <option value="superCritChanceIncrease">슈퍼 치명타 확률 증가 (%)</option>
+                                <option value="finalAttackIncrease">최종 공격력 증가 (%)</option>
+                                <option value="totalDPSIncrease">최종 피해량 증가 (%)</option>
                             </select>
                         </div>
                         <div class="input-field">
@@ -673,11 +704,13 @@
                 </div>
 
                 <div class="groundrule-subsection">
-                    <div class="groundrule-title">📋 Ground Rule (데미지 계산식)</div>
+                    <div class="groundrule-title">📋 사용된 데미지 계산식</div>
                     <div class="groundrule-content">• 최종 공격력 = 기본 공격력 + (기본 공격력 × 공격력 증가 옵션의 총 합)
+• 최종 공격력 증가 : 최종 공격력 + (최종 공격력 × 최종 공격력 증가 옵션의 총 합)
 • 1회 치명타 피해 = 최종 공격력 × (치명타 피해 %)
 • 1회 슈퍼 치명타 피해 = 최종 공격력 × (치명타 피해 %) × (슈퍼 치명타 피해 %)
-• 평균 딜량(딜) = (1 - 치명타 확률) × 기본 공격력 + (치명타 확률 × (1 - 슈퍼 치명타 확률)) × 치명타 피해 + (치명타 확률 × 슈퍼 치명타 확률) × 슈퍼 치명타 피해</div>
+• 평균 딜량(딜) = (1 - 치명타 확률) × 최종 공격력 + (치명타 확률 × (1 - 슈퍼 치명타 확률)) × 치명타 피해 + (치명타 확률 × 슈퍼 치명타 확률) × 슈퍼 치명타 피해
+• 최종 피해량 증가 옵션 : 평균 딜량 × (1 + 최종 피해량 증가%)</div>
                 </div>
             </div>
         </div>
@@ -686,13 +719,21 @@
     <div class="guide-modal" id="critGuideModal" onclick="toggleGuidePopup(event)">
         <div class="modal-box" onclick="event.stopPropagation()">
             <h2>작성 방법 가이드</h2>
-            <p>캐릭터 정보의 수치를 직접 입력하면 됩니다.</p>
+            <p>캐릭터의 수치를 직접 입력하면 됩니다.</p>
+            <p>캐릭터 정보의 돋보기 또는 전투화면 초상화를 눌러서 조회 가능</p>
+            <p>전투화면 초상화에서 보이는 정보가 가장 정확한 최종 수치입니다.</p>
             <ul>
-                <li><strong>기본 공격력</strong> : 공격력 수치 중 검은색으로 표현된 기본 공격력 수치를 입력합니다</li>
+                <li><strong>기본 공격력</strong> : 공격력 수치 중 흰색으로 표현된 기본 공격력 수치를 입력합니다</li>
                 <li><strong>공격력 증가량</strong> : 공격력 수치 중 +로 표현된 초록색 수치를 입력합니다.</li>
                 <li><strong>치명타 피해/확률</strong> : 총 합을 % 단위로 입력합니다. 예시: (2% + 28%)이면 30 입력</li>
-                <li><strong>슈퍼 치명타 피해/확률</strong> : 위와 동일</li>
+                <li><strong>슈퍼 치명타 피해/확률</strong> : 위와 동일. 단, 전투중에 안보이므로 따로 정보 조회 필요</li>
             </ul>
+
+            <div class="guide-images">
+                <img src="battle_icon_fixed.jpg" alt="전투 아이콘 예시">
+                <img src="char_info_fixed.jpg" alt="캐릭터 정보 예시">
+            </div>
+
             <button id="guideClose" onclick="toggleGuidePopup(event)">닫기</button>
         </div>
     </div>
@@ -716,14 +757,19 @@
                 'critDamageIncrease': '치명타 피해 증가',
                 'critChanceIncrease': '치명타 확률 증가',
                 'superCritDamageIncrease': '슈퍼 치명타 피해 증가',
-                'superCritChanceIncrease': '슈퍼 치명타 확률 증가'
+                'superCritChanceIncrease': '슈퍼 치명타 확률 증가',
+                'finalAttackIncrease': '최종 공격력 증가',
+                'totalDPSIncrease': '최종 피해량 증가'
             };
             return labels[type] || type;
         }
 
-        function calculateDPS(baseAttack, attackIncrease, critDamage, critChance, superCritDamage, superCritChance) {
+        function calculateDPS(baseAttack, attackIncrease, critDamage, critChance, superCritDamage, superCritChance, finalAttackIncrease = 0, totalDPSIncrease = 0) {
             // 최종 공격력 = 기본 공격력 + 기본 공격력 * (공격력 증가 옵션의 총 합%)
-            const finalAttack = baseAttack + baseAttack * (attackIncrease / 100);
+            let finalAttack = baseAttack + baseAttack * (attackIncrease / 100);
+
+            // 최종 공격력 증가 적용
+            finalAttack *= (1 + finalAttackIncrease / 100);
 
             // 확률 변환
             const cCh = Math.min(1, critChance / 100);
@@ -736,14 +782,17 @@
             const superCritDmg = finalAttack * (critDamage / 100) * (superCritDamage / 100);
 
             // 평균 딜량 계산
-            // = (1 - 치명타 확률) * 기본 공격력
+            // = (1 - 치명타 확률) * 최종 공격력
             //   + (치명타 확률 * (1 - 슈퍼 치명타 확률)) * 치명타 피해
             //   + (치명타 확률 * 슈퍼 치명타 확률) * 슈퍼 치명타 피해
             const baseDPS = (1 - cCh) * finalAttack;
             const critDPS = cCh * (1 - sCh) * critDmg;
             const superCritDPS = cCh * sCh * superCritDmg;
 
-            const totalDPS = baseDPS + critDPS + superCritDPS;
+            let totalDPS = baseDPS + critDPS + superCritDPS;
+
+            // 최종 피해량 증가 적용
+            totalDPS *= (1 + totalDPSIncrease / 100);
 
             return {
                 finalAttack: finalAttack,
@@ -802,7 +851,9 @@
                     critDamage: critDamage,
                     critChance: critChance,
                     superCritDamage: superCritDamage,
-                    superCritChance: superCritChance
+                    superCritChance: superCritChance,
+                    finalAttackIncrease: 0,
+                    totalDPSIncrease: 0
                 };
 
                 if (option1Type === 'attackIncrease') {
@@ -815,6 +866,10 @@
                     option1Stats.superCritDamage += option1Value;
                 } else if (option1Type === 'superCritChanceIncrease') {
                     option1Stats.superCritChance += option1Value;
+                } else if (option1Type === 'finalAttackIncrease') {
+                    option1Stats.finalAttackIncrease += option1Value;
+                } else if (option1Type === 'totalDPSIncrease') {
+                    option1Stats.totalDPSIncrease += option1Value;
                 }
 
                 const option1DPS = calculateDPS(
@@ -823,7 +878,9 @@
                     option1Stats.critDamage,
                     option1Stats.critChance,
                     option1Stats.superCritDamage,
-                    option1Stats.superCritChance
+                    option1Stats.superCritChance,
+                    option1Stats.finalAttackIncrease,
+                    option1Stats.totalDPSIncrease
                 );
 
                 // 선택지 2 DPS 계산
@@ -832,7 +889,9 @@
                     critDamage: critDamage,
                     critChance: critChance,
                     superCritDamage: superCritDamage,
-                    superCritChance: superCritChance
+                    superCritChance: superCritChance,
+                    finalAttackIncrease: 0,
+                    totalDPSIncrease: 0
                 };
 
                 if (option2Type === 'attackIncrease') {
@@ -845,6 +904,10 @@
                     option2Stats.superCritDamage += option2Value;
                 } else if (option2Type === 'superCritChanceIncrease') {
                     option2Stats.superCritChance += option2Value;
+                } else if (option2Type === 'finalAttackIncrease') {
+                    option2Stats.finalAttackIncrease += option2Value;
+                } else if (option2Type === 'totalDPSIncrease') {
+                    option2Stats.totalDPSIncrease += option2Value;
                 }
 
                 const option2DPS = calculateDPS(
@@ -853,7 +916,9 @@
                     option2Stats.critDamage,
                     option2Stats.critChance,
                     option2Stats.superCritDamage,
-                    option2Stats.superCritChance
+                    option2Stats.superCritChance,
+                    option2Stats.finalAttackIncrease,
+                    option2Stats.totalDPSIncrease
                 );
 
                 // 결과 표시
