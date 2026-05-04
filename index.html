@@ -717,7 +717,7 @@
     </div>
 
     <div class="guide-modal" id="critGuideModal" onclick="toggleGuidePopup(event)">
-        <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-box">
             <h2>작성 방법 가이드</h2>
             <p>캐릭터의 수치를 직접 입력하면 됩니다.</p>
             <p>캐릭터 정보의 돋보기 또는 전투화면 초상화를 눌러서 조회 가능</p>
@@ -1076,11 +1076,13 @@
 
         function toggleGuidePopup(event) {
             const modal = document.getElementById('critGuideModal');
-            if (event && event.target && (event.target.id === 'guideClose' || event.target.classList.contains('guide-modal'))) {
-                modal.classList.remove('show');
+            if (!event) {
+                // 가이드 링크에서 인자 없이 호출되면 토글
+                modal.classList.toggle('show');
                 return;
             }
-            modal.classList.toggle('show');
+            // 다른 모든 곳(배경, 팝업 내용, 버튼 등)을 클릭하면 닫기
+            modal.classList.remove('show');
         }
 
         // Enter 키로 계산 실행
