@@ -678,14 +678,14 @@
                     <div class="comparison-detail" id="winnerDetail">증가량 차이: 0</div>
                 </div>
                 <div class="result-item">
-                    <div class="result-label">선택지 1 - 평균 딜량</div>
+                    <div class="result-label">선택지 1 - 최종 피해량</div>
                     <div class="result-value" id="option1Dps">0</div>
                     <div class="result-change">증가량: <span id="option1Change">0</span></div>
                     <div class="stats-preview" id="option1Stats"></div>
                 </div>
 
                 <div class="result-item option2">
-                    <div class="result-label">선택지 2 - 평균 딜량</div>
+                    <div class="result-label">선택지 2 - 최종 피해량</div>
                     <div class="result-value" id="option2Dps">0</div>
                     <div class="result-change">증가량: <span id="option2Change">0</span></div>
                     <div class="stats-preview" id="option2Stats"></div>
@@ -706,11 +706,11 @@
                 <div class="groundrule-subsection">
                     <div class="groundrule-title">📋 사용된 데미지 계산식</div>
                     <div class="groundrule-content">• 최종 공격력 = 기본 공격력 + (기본 공격력 × 공격력 증가 옵션의 총 합)
-• 최종 공격력 증가 : 최종 공격력 + (최종 공격력 × 최종 공격력 증가 옵션의 총 합)
-• 1회 치명타 피해 = 최종 공격력 × (치명타 피해 %)
-• 1회 슈퍼 치명타 피해 = 최종 공격력 × (치명타 피해 %) × (슈퍼 치명타 피해 %)
-• 평균 딜량(딜) = (1 - 치명타 확률) × 최종 공격력 + (치명타 확률 × (1 - 슈퍼 치명타 확률)) × 치명타 피해 + (치명타 확률 × 슈퍼 치명타 확률) × 슈퍼 치명타 피해
-• 최종 피해량 증가 옵션 : 평균 딜량 × (1 + 최종 피해량 증가%)</div>
+• 최종 공격력 증가 = 최종 공격력 + (최종 공격력 × 최종 공격력 증가 옵션의 총 합)
+• 치명타 피해 = 최종 공격력 × (치명타 피해 %)
+• 슈퍼 치명타 피해 = 최종 공격력 × (치명타 피해 %) × (슈퍼 치명타 피해 %)
+• 기대 딜량 = (1 - 치명타 확률) × 최종 공격력 + (치명타 확률 × (1 - 슈퍼 치명타 확률)) × 치명타 피해 + (치명타 확률 × 슈퍼 치명타 확률) × 슈퍼 치명타 피해
+• 최종 피해량 증가 옵션 = 기대 딜량 × (1 + 최종 피해량 증가%)</div>
                 </div>
             </div>
         </div>
